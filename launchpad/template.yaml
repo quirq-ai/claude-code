@@ -1,0 +1,37 @@
+apiVersion: launchpad.xo.builders/v1
+kind: Template
+metadata:
+  name: claude-code
+  displayName: Claude Code (Remote Control)
+  description: Claude Code with Remote Control. Sign in with your Claude subscription, then work from claude.ai/code or the Claude app.
+  icon: terminal
+  category: agents
+spec:
+  source: image
+  # Pinned (Launchpad refuses :latest). DevOps replaces <project> with the Harbor project the image is pushed to.
+  image: registry.xo.builders/<project>/claude-code:0.1.0
+  port: 8080
+  healthPath: /healthz
+  sizes:
+    default: xo.medium
+    allowed: [xo.medium]
+  parameters:
+    - name: sessionName
+      label: Session name
+      description: Shown in claude.ai/code and the Claude app.
+      type: string
+      required: false
+    - name: task
+      label: Task (optional)
+      description: Saved as TASK.md in the work directory.
+      type: string
+      required: false
+  env:
+    PUBLIC_URL: "{{ app.url }}"
+    SESSION_NAME: "{{ params.sessionName }}"
+    TASK: "{{ params.task }}"
+  storage:
+    - path: /data
+      size: 10Gi
+  fsGroup: 1000
+  notes: Open the app's logs and follow the CONNECT link to sign in with your Claude subscription. Then pick the session in claude.ai/code or the Claude app.
